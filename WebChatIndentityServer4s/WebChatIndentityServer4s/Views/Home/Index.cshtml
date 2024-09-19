@@ -1,0 +1,290 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="alert alert-warning alert-dismissible d-none" id="errorAlert" role="alert">
+    <span data-bind="text: serverInfoMessage"></span>
+    <button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+
+<div class="d-flex flex-column justify-content-center align-items-center vh-100" data-bind="css: isLoading() ? 'd-flex' : 'd-none'">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div class="app" data-bind="css: isLoading() ? 'd-none' : ''">
+    <div class="sidebar">
+        <div class="header">
+            <h5>Chat Rooms</h5>
+            <a href="#" id="create-room" data-toggle="modal" data-target="#create-room-modal">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+        <ul class="=rooms list-unstyled" id="room-list" data-bind="foreach: chatRooms">
+
+            <li>
+                <!--Chuyền "$data.id" ra ngoài-->                                 <!--Khi click vào thì sẽ gọi đến hàm "joinRoom" trong file "chat.js" này và chuyền dữ liệu "$data" vào sử dụng "bind" để chuyền vào, khi chuyền dữ liệu lên rồi thì sẽ sửa lại "css" bằng cách "css: {active: $root.joinedRoom() == $data.name()}" cho "active" để in đậm lên màu-->
+                <a data-bind="text: $data.name, attr: {'data-roomId': $data.id}, click: $parent.joinRoom.bind($data), css: {active: $root.joinedRoom() == $data.name()}" href="#">ABC</a>
+            </li>
+
+        </ul>
+
+        <div class="profile">
+            <div>
+                <img src="~/images/icons/avatar1.jpg" class="user-avatar" data-bind="attr: {src: '/images/icons/' + myAvatar()}" />
+
+                <!--Khi Click vào  thì sẽ đi đến thông tin của user(profile của mình) đấy-->
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" data-bind="text: myName">Tên đăng nhập</a>
+            </div>
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">
+                <button type="submit" class="btn-sign-out">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="main-content" data-bind="visible: joinedRoom().length == 0">
+        <span class="m-auto">
+            ABC XYZ
+        </span>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h5 id="joinedRoom" data-bind="text: joinedRoom()"></h5>
+            <div class="room-actions">
+                <button type="button" class="btn btn-link text-secondary px-1" data-toggle="modal" data-target="#rename-room-modal">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-link text-secondary px-1" data-toggle="modal" data-target="#remove-room-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chat-body">
+            <ul class="list-unstyled" data-bind="foreach: chatMessages">
+                <li>
+                    <div class="chat-message d-flex" data-bind="css: $data.isMine() === true ? 'ismine' : 'isother'">
+                        <div class="left-side">
+                            <img src="/images/icons/avatar1.jpg" width="100" class="message-avatar" data-bind="attr: {src: '/images/icons/' + $data.avatar()}" />
+                        </div>
+                        <div class="message-content" d-flex fle>
+                            <div class="d-flex justify-content-between">
+                                <span class="author" data-bind="text: $data.from">Tác giả</span>
+                                <span class="timestamp">
+                                    <i class="far fa-clock"></i>
+                                    <span data-bind="text: $data.timestamp"></span>
+                                </span>
+                            </div>
+
+                            <span class="content" data-bind="html: $data.content"></span>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+        <div class="chat-input">
+            <input id="chat-message" type="text" value="" placeholder="Nhập chat" data-bind="value: message, valueUpdate: 'afterkeydown', event: {keypress: onEnter}" />
+            <div class="actions d-flex align-items-center">
+                <form method="post" id="uploadForm" asp-action="Upload" asp-controller="Upload" enctype="multipart/form-data">
+                    <label for="UploadedFile" class="custom-file-upload">
+                        <i class="far fa-image"></i>
+                    </label>
+                    <input type="hidden" name="RoomId" data-bind="value: $data.joinedRoomId()" />
+                    <input type="file" name="File" id="UploadedFile"  accept=".jpg,.jpeg,.png" data-bind="event: {change: uploadFiles}" />
+                </form>
+                <a id="emojibtn" href="#">
+                    <i class="far fa-smile"></i>
+                </a>
+                <i class="fas fa-paper-plane" id="btn-send-message" data-bind="click: sendNewMessage"></i>
+            </div>
+            <div class="emoticon-container d-none" id="emojis-container">
+                <a href="#">
+                    <input type="hidden" value=":)" />
+                    <img src="~/images/emojis/emoji1.png" />
+                </a>
+                <a href="#">
+                    <input type="hidden" value=":P" />
+                    <img src="~/images/emojis/emoji2.png" />
+                </a>
+                <a href="#">
+                    <input type="hidden" value=":O" />
+                    <img src="~/images/emojis/emoji3.png" />
+                </a>
+                <a href="#">
+                    <input type="hidden" value=":-)" />
+                    <img src="~/images/emojis/emoji4.png" />
+                </a>
+                <a href="#">
+                    <input type="hidden" value="B|" />
+                    <img src="~/images/emojis/emoji5.png" />
+                </a>
+                <a href="#">
+                    <input type="hidden" value=":D" />
+                    <img src="~/images/emojis/emoji6.png" />
+                </a>
+                <a href="#">
+                    <input type="hidden" value="<3" />
+                    <img src="~/images/emojis/emoji7.png" />
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="users-container">
+        <div class="header">
+            <h5>
+                who's here (<span data-bind="text: filteredChatUsers().length">0</span>)
+            </h5>
+        </div>
+        <ul class="list-unstyled" id="users-list" data-bind="foreach: filteredChatUsers">
+            <li>                                                                                        <!--Chuyền dữ liệu ảnh vào-->
+                <img class="user-avatar" width="30" src="~/images/icons/avatar1.jpg" data-bind="attr: {src: '/images/icons/' + $data.avatar()}" />
+                <div class="right-side">
+                    <!--Để Click lấy được User-->
+                    <input type="hidden" class="username" data-bind="value: $data.userName" />
+                    @* <p data-bind ="text: $data.id"></p> *@
+                    <p data-bind="text: $data.role"></p>
+                    <input type="hidden" class="id_username" data-bind="value: $data.id" />
+                    <span class="author" data-bind="text: $data.displayName"></span>
+                    <small data-bind="text: $data.device">Mobile</small>
+                </div>
+            </li>
+        </ul>
+        <!--Chuyền biến "filter"(biến này chính là "self.filter" bên file "chat.js") bên file "chat.js" vào để nhận dữ liệu chuyền vào, "valueUpdate: "afterkeydown"" nghĩa là khi ấn 1 bất kỳ 1 key(Phím) nào thì sẽ update lại "filter"-->
+        <input type="text" placeholder="Tìm kiếm..." class="" data-bind="value: filter, valueUpdate: 'afterkeydown'" />
+    </div>
+
+    
+</div>
+
+<div class="modal" id="create-room-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Rooms</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" placeholder="Nhập tên phòng" id="roomName" />
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-primary" type="button" data-dismiss="modal" data-bind="click: createRoom">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="rename-room-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Rename Rooms</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--"$root" này nghĩa là trỏ đến model, ở đây sẽ trỏ đến model trong file "chat.js" ở đây model trong file đấy chính là "self.joinedRoom"-->
+                <input type="text" class="form-control" placeholder="Nhập tên phòng" id="newRoomName" data-bind="value: $root.joinedRoom()" />
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-primary" type="button" data-dismiss="modal" data-bind="click: editRoom">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="remove-room-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Remove Rooms</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn chắc chắn muốn xóa room này</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-danger" type="button" data-dismiss="modal" data-bind="click: deleteRoom">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @* <script src="~/js/site.js"></script> *@
+    <script src="~/lib/knockoutjs/knockout-3.5.1.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
+
+        <script>
+            $(function () {
+
+
+                // Khi click vào thẻ ul thì sẽ click luôn vào thằng "li"
+                $('ul#users-list').on("click", 'li', function () {
+                    var username = $("input[type=hidden].username", $(this)).val() // lấy ra username trong thẻ input có type là "hidden"
+                    var input = $("#chat-message") // lấy ra id "chat-message"
+
+                    var text = input.val() // Lấy ra giá trị hiện tại của Input đấy
+                    if (text.startsWith("/")) { // Kiểm tra xem có dấu "/" không
+                        text = text.split(")")[1] // Nếu có dấu "/" thì cắt bỏ dấu ")" sử dụng hàm "split" để cắt,
+                        /*"[1]": Sau khi tách chuỗi, chúng ta chọn phần tử thứ hai trong mảng(vị trí 1), chỉ số
+                            bắt đầu từ 0. Điều này có nghĩa là chúng ta lấy phần tử sau dấu ) đầu tiên.
+
+                            Ví dụ, giả sử text = "abc)def)ghi", sau khi thực hiện text.split(")"), kết quả sẽ là ['abc', 'def', 'ghi']. Sau đó,
+                            chúng ta chọn phần tử thứ hai ('def'), và lưu nó vào biến text. Do đó, text sẽ được gán giá trị là 'def'
+                        */
+                    }
+
+                    // Nếu không có
+                    text = "/private(" + username + ") " + text.trim() // "trim()" là cắt 2 khoảng trắng 2 bên
+                    input.val(text)
+                    input.change() // "change()"  này nghĩa là lập tức thay đổi giá trị ở trên thẻ input này
+                    input.focus()
+                })
+
+                // 'a' ở đây nghĩa là click trên từng thẻ "a"
+                $('#emojis-container').on('click', 'a', function () {
+                    console.log("Đã vào")
+                    var value = $("input", $(this)).val() // Lấy giá trị ở thể "input" ở thẻ "a" khi click vào thẻ "a"
+                    var input = $("#chat-message")
+                    input.val(input.val() + value) // Cộng giá trị, sét lại giá trị cho thẻ "input"
+                    input.focus()
+                    input.change() // Cộng xong cập nhật luôn thẻ input
+                })
+
+                $("#emojibtn").click(function () {
+                    $("#emojis-container").toggleClass("d-none")
+                })
+
+                $("#chat-message, #btn-send-message").click(function () {
+                    $("#emojis-container").addClass("d-none")
+                })
+
+                $(".modal").on("hidden.bs.modal", function () {
+                    $(".modal-body input:not(#newRoomName)").val("")
+                })
+
+                $(".alert .close").on('click', function () {
+                    $(this).parent().hide()
+                })
+            })
+    </script>
+}

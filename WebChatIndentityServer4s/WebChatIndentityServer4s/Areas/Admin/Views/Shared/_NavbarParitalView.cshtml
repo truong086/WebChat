@@ -1,0 +1,66 @@
+﻿<style>
+    tr, th, td{
+        width: 500px;
+        margin: 10px 30px;
+    }
+</style>
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Quản lý Web Chat <sup>2</sup></div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item active">
+        <a class="nav-link" asp-action="Index" asp-area="Admin" asp-controller="Home">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Trang chủ</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Interface
+    </div>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+           asp-action="Index" asp-area="Admin" asp-controller="AdminThongBao">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Quản lý thông báo</span>
+        </a>
+
+        <a class="nav-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+           asp-controller="AdminThongBao" asp-area="Admin" asp-action="CreateJoinOrBlock">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Quản lý Join Or Block</span>
+        </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        <a href="../Login/logout">Đăng xuất</a>
+    </div>
+
+    <!-- Sidebar Message -->
+    <div class="sidebar-card d-none d-lg-flex">
+        <img class="sidebar-card-illustration mb-2" src="img/undraw_rocket.svg" alt="...">
+        <p class="text-center mb-2"><strong>SB Admin Pro</strong> is packed with premium features, components, and more!</p>
+        <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
+    </div>
+
+</ul>

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\WebChatIndentityServer4s.props" />
+</Project>

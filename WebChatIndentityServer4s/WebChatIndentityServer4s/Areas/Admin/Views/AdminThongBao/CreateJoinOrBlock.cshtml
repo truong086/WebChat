@@ -1,0 +1,19 @@
+﻿@model ViewModelBlockOrJoin
+@{
+    ViewData["Title"] = "CreateJoinOrBlock";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<form action="JoinOrBlock" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <select asp-for="Id_User" asp-items="@ViewBag.users"></select>
+    <select asp-for="Id_Room" asp-items="@ViewBag.rooms"></select>
+    <select asp-for="Action">
+        <option value="true" selected>True</option>
+        <option value="false">False</option>
+    </select>
+
+    <div class="form-group">
+        <input type="submit" value="Gửi" class="btn btn-primary" />
+    </div>
+</form>
